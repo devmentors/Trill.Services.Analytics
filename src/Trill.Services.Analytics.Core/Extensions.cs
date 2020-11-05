@@ -38,11 +38,6 @@ namespace Trill.Services.Analytics.Core
     {
         public static IConveyBuilder AddCore(this IConveyBuilder builder)
         {
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
-            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
-            
             builder.Services
                 .AddScoped<IMessageBroker, MessageBroker>()
                 .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
@@ -74,6 +69,11 @@ namespace Trill.Services.Analytics.Core
 
             builder.Services.AddScoped<LogContextMiddleware>()
                 .AddSingleton<ICorrelationIdFactory, CorrelationIdFactory>();
+            
+            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
+            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
+            builder.Services.TryDecorate(typeof(ICommandHandler<>), typeof(OutboxCommandHandlerDecorator<>));
+            builder.Services.TryDecorate(typeof(IEventHandler<>), typeof(OutboxEventHandlerDecorator<>));
             
             return builder;
         }
