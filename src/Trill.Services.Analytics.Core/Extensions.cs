@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using Convey;
 using Convey.Auth;
 using Convey.CQRS.Commands;
@@ -25,7 +26,6 @@ using Convey.WebApi.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Trill.Services.Analytics.Core.Decorators;
 using Trill.Services.Analytics.Core.Events.External;
 using Trill.Services.Analytics.Core.Logging;
@@ -90,20 +90,30 @@ namespace Trill.Services.Analytics.Core
                 .UsePrometheus()
                 .UseAuthentication()
                 .UseRabbitMq()
-                .SubscribeEvent<StoryRated>()
-                .SubscribeEvent<StorySent>()
                 .SubscribeEvent<UserCreated>()
                 .SubscribeEvent<UserFollowed>()
                 .SubscribeEvent<UserUnfollowed>();
 
             return app;
         }
-        
+
         internal static CorrelationContext GetCorrelationContext(this IHttpContextAccessor accessor)
-            => accessor.HttpContext?.Request.Headers.TryGetValue("Correlation-Context", out var json) is true
-                ? JsonConvert.DeserializeObject<CorrelationContext>(json.FirstOrDefault())
-                : null;
-        
+        {
+            if (accessor.HttpContext is null)
+            {
+                return null;
+            }
+
+            if (!accessor.HttpContext.Request.Headers.TryGetValue("Correlation-Context", out var json))
+            {
+                return null;
+            }
+
+            var value = json.FirstOrDefault();
+
+            return string.IsNullOrWhiteSpace(value) ? null : JsonSerializer.Deserialize<CorrelationContext>(value);
+        }
+
         internal static string GetSpanContext(this IMessageProperties messageProperties, string header)
         {
             if (messageProperties is null)
