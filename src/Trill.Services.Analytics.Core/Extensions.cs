@@ -91,6 +91,7 @@ namespace Trill.Services.Analytics.Core
                 .UseAuthentication()
                 .UseRabbitMq()
                 .SubscribeEvent<StorySent>()
+                .SubscribeEvent<StoryRated>()
                 .SubscribeEvent<UserCreated>()
                 .SubscribeEvent<UserFollowed>()
                 .SubscribeEvent<UserUnfollowed>();
