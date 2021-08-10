@@ -90,6 +90,7 @@ namespace Trill.Services.Analytics.Core
                 .UsePrometheus()
                 .UseAuthentication()
                 .UseRabbitMq()
+                .SubscribeEvent<StorySent>()
                 .SubscribeEvent<UserCreated>()
                 .SubscribeEvent<UserFollowed>()
                 .SubscribeEvent<UserUnfollowed>();
