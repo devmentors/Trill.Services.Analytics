@@ -15,6 +15,7 @@ using Convey.MessageBrokers.CQRS;
 using Convey.MessageBrokers.Outbox;
 using Convey.MessageBrokers.Outbox.Mongo;
 using Convey.MessageBrokers.RabbitMQ;
+using Convey.MessageBrokers.RabbitMQ.Serializers;
 using Convey.Metrics.Prometheus;
 using Convey.Persistence.MongoDB;
 using Convey.Persistence.Redis;
@@ -58,7 +59,8 @@ namespace Trill.Services.Analytics.Core
                 .AddHttpClient()
                 .AddConsul()
                 .AddFabio()
-                .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin())
+                .AddRabbitMq(plugins: p => p.AddJaegerRabbitMqPlugin(),
+                    serializer: new NewtonsoftJsonRabbitMqSerializer())
                 .AddMessageOutbox(o => o.AddMongo())
                 .AddMongo()
                 .AddRedis()
